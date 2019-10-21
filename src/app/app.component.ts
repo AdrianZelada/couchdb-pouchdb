@@ -4,6 +4,7 @@ import { Platform } from '@ionic/angular';
 import { SplashScreen } from '@ionic-native/splash-screen/ngx';
 import { StatusBar } from '@ionic-native/status-bar/ngx';
 import {UsersService} from './services/users.service';
+import {ThmedicalappoitmentsService} from "./services/thmedicalappoitments.service";
 
 @Component({
   selector: 'app-root',
@@ -28,7 +29,8 @@ export class AppComponent {
     private platform: Platform,
     private splashScreen: SplashScreen,
     private statusBar: StatusBar,
-    private userService: UsersService
+    private userService: UsersService,
+    private medical: ThmedicalappoitmentsService
   ) {
     this.initializeApp();
   }
@@ -38,9 +40,20 @@ export class AppComponent {
       this.statusBar.styleDefault();
       this.splashScreen.hide();
     });
+
+    // this.userService.appoitments$.subscribe((data) => {
+    //   console.log('this.userService.appoitments$');
+    //   console.log(data);
+    // })
+
+    this.medical.getAll();
+
+    this.medical.appoitments$.subscribe((response) => {
+      console.log(response);
+    });
   }
 
-    create() {
+  create() {
     this.userService.create();
-    }
+  }
 }
