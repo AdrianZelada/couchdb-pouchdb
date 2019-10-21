@@ -37,10 +37,15 @@ export class AppComponent {
     this.platform.ready().then(() => {
       this.statusBar.styleDefault();
       this.splashScreen.hide();
+      this.userService.getAll();
     });
   }
 
-    create() {
+  create() {
     this.userService.create();
-    }
+  }
+
+  getAll() {
+    // this.userService.getAll();
+  }
 }

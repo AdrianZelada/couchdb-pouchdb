@@ -1,15 +1,17 @@
-import {Injectable, NgZone} from '@angular/core';
+import { Injectable, NgZone } from '@angular/core';
 import PouchDB from 'pouchdb';
-import {fromPromise} from 'rxjs/internal-compatibility';
-import {map} from 'rxjs/operators';
-import {BehaviorSubject, Observable} from 'rxjs';
+
+import { map, tap } from 'rxjs/operators';
+import { BehaviorSubject, Observable, from } from 'rxjs';
+
+// import { asObservable } from "rxjs/Observable";
 
 @Injectable({
     providedIn: 'root'
 })
 export class UsersService {
-    usersLDb: any ;
-    usersRDb: any ;
+    usersLDb: any;
+    usersRDb: any;
 
     private users: BehaviorSubject<any> = new BehaviorSubject<any>([]);
     public users$: Observable<any> = this.users.asObservable();
@@ -17,11 +19,11 @@ export class UsersService {
         this.usersLDb = new PouchDB('users');
         this.usersRDb = new PouchDB('http://127.0.0.1:5984/users');
 
-        this.usersLDb.sync(this.usersRDb, {live: true, doc_ids: ["a35b2924aa710e8263cda1b8330005c8"]}).on('complete', function () {
+        this.usersLDb.sync(this.usersRDb, { live: true }).on('complete', function () {
             console.log('complete');
             // yay, we're in sync!
         }).on('error', function (err) {
-            console.log('complete error');
+            console.log('complete error', err);
             // boo, we hit an error!
         });
 
@@ -29,7 +31,7 @@ export class UsersService {
             since: 'now',
             live: true,
             include_docs: true
-        }).on('change',  (change) =>{
+        }).on('change', (change) => {
             console.log('change');
             console.log(change);
             this.getAll();
@@ -43,8 +45,9 @@ export class UsersService {
     create() {
         this.usersLDb.bulkDocs([
             {
-                name: Date.now()
-            }])
+                name: Date.now(),
+                skills: 'JAVASCRIPTs'
+            }]);
     }
 
 
@@ -55,11 +58,16 @@ export class UsersService {
         //   })
         // )
         this.zone.run(() => {
-            this.usersLDb.allDocs({include_docs: true}).then((data) => {
+            this.usersLDb.allDocs({ include_docs: true }).then((data) => {
+                console.log('GETALL===========++>', data);
                 this.users.next(data.rows || data);
             });
         })
 
+    }
+
+    getUsers() {
+        return this.usersLDb.allDocs({include_docs: true});
     }
 
 }
