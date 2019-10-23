@@ -21,8 +21,9 @@ export class ThmedicalappoitmentsService {
   }
 
   syncDataDb(ids) {
-    this.appoitmentsLDb = new PouchDB('thmedicalappoitments');
-    this.appoitmentsRDb = new PouchDB('http://127.0.0.1:5984/thmedicalappoitments');
+    console.log(ids)
+    this.appoitmentsLDb = new PouchDB('th_medical_appointment');
+    this.appoitmentsRDb = new PouchDB('http://127.0.0.1:5984/th_medical_appointment');
     this.appoitmentsLDb.sync(this.appoitmentsRDb, {
       live:true,
       doc_ids: ids
@@ -47,6 +48,9 @@ export class ThmedicalappoitmentsService {
     this.getListDataToSync().subscribe((data) => {
       console.log('this.getListDataToSync')
       this.syncDataDb(data);
+      this.getDataDb();
+    }, (e)=>{
+      console.log(e)
       this.getDataDb();
     });
   }
