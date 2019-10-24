@@ -21,7 +21,6 @@ export class ThmedicalappoitmentsService {
   }
 
   syncDataDb(ids) {
-    console.log(ids)
     this.appoitmentsLDb = new PouchDB('th_medical_appointment');
     this.appoitmentsRDb = new PouchDB('http://127.0.0.1:5984/th_medical_appointment');
     this.appoitmentsLDb.sync(this.appoitmentsRDb, {
@@ -29,21 +28,15 @@ export class ThmedicalappoitmentsService {
       retry:true,
       doc_ids: ids
     }).on('change', (change) => {
-        console.log('change');
-        console.log(change);
         this.getDataDb();
     }).on('complete', () =>{
-      console.log('complete');
       this.getDataDb();
     }).on('error', () => {
-      console.log('error');
     });
   }
   getDataDb() {
     this.zone.run(() => {
       this.appoitmentsLDb.allDocs({include_docs: true}).then((data) => {
-        console.log("data xxxx ");
-        console.log(data);
         this.appoitments.next(data.rows || data);
       });
     })
@@ -51,7 +44,6 @@ export class ThmedicalappoitmentsService {
 
   getAll() {
     this.getListDataToSync().subscribe((data: any) => {
-      console.log('this.getListDataToSync');
       if( data.length > 0) {
           localStorage.setItem('medical', JSON.stringify(data));
       }
