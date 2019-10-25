@@ -2,7 +2,6 @@ import {Injectable, NgZone} from '@angular/core';
 import {BehaviorSubject, Observable} from "rxjs";
 import {HttpClient} from "@angular/common/http";
 import PouchDB from "pouchdb";
-import {switchMap} from "rxjs/operators";
 
 @Injectable({
   providedIn: 'root'
@@ -44,11 +43,14 @@ export class ThmedicalappoitmentsService {
 
   getAll() {
     this.getListDataToSync().subscribe((data: any) => {
-      if( data.length > 0) {
-          localStorage.setItem('medical', JSON.stringify(data));
-      }
+      // if( data.length > 0) {
+      //     localStorage.setItem('medical', JSON.stringify(data));
+      // }
       this.syncDataDb(data);
-      this.getDataDb();
+      this.removeInDevice(data).then(() => {
+          this.getDataDb();
+          localStorage.setItem('medical', JSON.stringify(data));
+      });
     }, (e)=>{
       console.log(e)
       const ids = JSON.parse(localStorage.getItem('medical'));
@@ -61,6 +63,46 @@ export class ThmedicalappoitmentsService {
       return this.appoitmentsLDb.put(data);
   }
 
+  removeInDevice(newIds: Array<any>){
+    const ids = this.getItem('medical');
+    const diffIds = this.diffData(ids, newIds);
+    const promiseDiff = diffIds.map((id) => {
+        return new Promise((resolve, reject) => {
+            this.appoitmentsLDb.get(id, (err, doc) => {
+                if (err) { return reject(err); }
+                this.appoitmentsLDb.remove(doc._id, doc._rev, (error, response) => {
+                    if (error) { return reject(error); }
+                    // handle response
+                    resolve(response);
+                });
+            });
+        });
+    });
+
+    return Promise.all(promiseDiff);
+    //   .then((resp: Array<any>) => {
+    //   console.log(resp);
+    // }).catch((e) => console.log(e));
+  }
+
+  private diffData(ids: Array<any>, newIds: Array<any>) {
+    const diffIds = [];
+    ids.forEach((id) => {
+      if (newIds.indexOf(id) === -1) {
+        diffIds.push(id);
+      }
+    });
+    return diffIds;
+  }
+
+  private getItem(key) {
+    const poll = localStorage.getItem(key);
+    if  ( poll ) {
+      return JSON.parse(poll);
+    } else {
+      return [];
+    }
+  }
 
 
 
