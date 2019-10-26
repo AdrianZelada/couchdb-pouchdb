@@ -48,7 +48,7 @@ export class UsersService {
         //     // handle errors
         // });
 
-        this.getMedicalAppoitments();
+        // this.getMedicalAppoitments();
     }
 
     create() {

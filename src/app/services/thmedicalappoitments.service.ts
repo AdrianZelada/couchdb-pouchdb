@@ -19,20 +19,94 @@ export class ThmedicalappoitmentsService {
     return this.http.get('http://localhost:3005/api/ThMedicalAppointments/syncData');
   }
 
-  syncDataDb(ids) {
+  syncDataDb(oldIds, ids, online = true) {
     this.appoitmentsLDb = new PouchDB('th_medical_appointment');
     this.appoitmentsRDb = new PouchDB('http://127.0.0.1:5984/th_medical_appointment');
-    this.appoitmentsLDb.sync(this.appoitmentsRDb, {
-      live:true,
-      retry:true,
-      doc_ids: ids
-    }).on('change', (change) => {
+
+    if (online) {
+        this.replicateDB(oldIds).then(() => {
+            this.appoitmentsLDb.destroy((e, respo) => {
+                if(e) {
+                    console.log('error');
+                    console.log(e);
+                } else {
+                    console.log('this.appoitmentsLDb', respo);
+                    localStorage.setItem('medical', JSON.stringify(ids));
+                    this.appoitmentsLDb = new PouchDB('th_medical_appointment');
+                    this.appoitmentsLDb.sync(this.appoitmentsRDb, {
+                        live:true,
+                        retry:true,
+                        doc_ids: ids
+                    }).on('change', (change) => {
+                        console.log('change');
+
+                        this.getDataDb();
+                    }).on('complete', () =>{
+                        console.log('complete');
+                        this.getDataDb();
+                    }).on('error', () => {
+                        console.log('error error error');
+                    });
+
+                    this.getDataDb();
+                }
+            })
+
+
+        }).catch((e) => {
+            console.log('eeeeeeee');
+            console.log(e);
+        });
+    } else {
+        this.appoitmentsLDb.sync(this.appoitmentsRDb, {
+            live:true,
+            retry:true,
+            doc_ids: oldIds
+        }).on('change', (change) => {
+            console.log('change');
+
+            this.getDataDb();
+        }).on('complete', () =>{
+            console.log('complete');
+            this.getDataDb();
+        }).on('error', () => {
+            console.log('error error error');
+        });
         this.getDataDb();
-    }).on('complete', () =>{
-      this.getDataDb();
-    }).on('error', () => {
-    });
+
+    }
+
+    // this.appoitmentsLDb.sync(this.appoitmentsRDb, {
+    //   live:true,
+    //   retry:true,
+    //   doc_ids: ids
+    // }).on('change', (change) => {
+    //     console.log('change');
+    //
+    //     this.getDataDb();
+    // }).on('complete', () =>{
+    //   console.log('complete');
+    //   this.getDataDb();
+    // }).on('error', () => {
+    // });
   }
+
+  replicateDB(ids) {
+    return new Promise((resolve, reject) => {
+        const repli = this.appoitmentsLDb.replicate
+          .to(this.appoitmentsRDb, {doc_ids: ids})
+          .on('complete', () =>{
+              console.log('complete');
+              repli.cancel();
+              resolve();
+          }).on('error', () => {
+            console.log('error');
+            reject();
+        });
+    })
+
+  }
+
   getDataDb() {
     this.zone.run(() => {
       this.appoitmentsLDb.allDocs({include_docs: true}).then((data) => {
@@ -46,16 +120,18 @@ export class ThmedicalappoitmentsService {
       // if( data.length > 0) {
       //     localStorage.setItem('medical', JSON.stringify(data));
       // }
-      this.syncDataDb(data);
-      this.removeInDevice(data).then(() => {
-          this.getDataDb();
-          localStorage.setItem('medical', JSON.stringify(data));
-      });
+      const oldIds = this.getItem('medical');
+
+      this.syncDataDb(oldIds, data);
+      // this.removeInDevice(data).then(() => {
+      //     this.getDataDb();
+      //     localStorage.setItem('medical', JSON.stringify(data));
+      // }).catch( e => console.log(e));
     }, (e)=>{
       console.log(e)
       const ids = JSON.parse(localStorage.getItem('medical'));
-      this.syncDataDb(ids);
-      this.getDataDb();
+      this.syncDataDb(ids, [], false);
+      // this.getDataDb();
     });
   }
 
@@ -64,8 +140,14 @@ export class ThmedicalappoitmentsService {
   }
 
   removeInDevice(newIds: Array<any>){
+    console.log('newIds');
+    console.log(newIds);
     const ids = this.getItem('medical');
     const diffIds = this.diffData(ids, newIds);
+    console.log('ids');
+    console.log(ids);
+    console.log('diffIds');
+    console.log(diffIds);
     const promiseDiff = diffIds.map((id) => {
         return new Promise((resolve, reject) => {
             this.appoitmentsLDb.get(id, (err, doc) => {
