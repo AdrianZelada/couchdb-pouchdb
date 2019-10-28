@@ -70,11 +70,16 @@ export class ThmedicalappoitmentsService {
         return new Promise((resolve, reject) => {
             this.appoitmentsLDb.get(id, (err, doc) => {
                 if (err) { return reject(err); }
+                // doc._deleted = true;
                 this.appoitmentsLDb.remove(doc._id, doc._rev, (error, response) => {
                     if (error) { return reject(error); }
                     // handle response
                     resolve(response);
                 });
+                // this.appoitmentsLDb.put(doc, (error, response) => {
+                //   if (error) { return reject(error); }
+                //   resolve(response);
+                // });
             });
         });
     });
