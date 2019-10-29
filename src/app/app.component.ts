@@ -5,6 +5,7 @@ import { SplashScreen } from '@ionic-native/splash-screen/ngx';
 import { StatusBar } from '@ionic-native/status-bar/ngx';
 import {UsersService} from './services/users.service';
 import {ThmedicalappoitmentsService} from "./services/thmedicalappoitments.service";
+import {ThbeneficiaryService} from "./beneficiary/thbeneficiary.service";
 
 @Component({
   selector: 'app-root',
@@ -30,7 +31,8 @@ export class AppComponent {
     private splashScreen: SplashScreen,
     private statusBar: StatusBar,
     private userService: UsersService,
-    private medical: ThmedicalappoitmentsService
+    private medical: ThmedicalappoitmentsService,
+    private beneficiary: ThbeneficiaryService
   ) {
     this.initializeApp();
   }
@@ -47,6 +49,7 @@ export class AppComponent {
     // })
 
     this.medical.getAll();
+    this.beneficiary.getAll();
 
     this.medical.appoitments$.subscribe((response) => {
       console.log(response);
