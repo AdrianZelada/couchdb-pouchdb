@@ -48,7 +48,7 @@ export class AppComponent {
     //   console.log(data);
     // })
 
-    this.medical.getAll();
+    // this.medical.getAll();
     this.beneficiary.getAll();
 
     this.medical.appoitments$.subscribe((response) => {
