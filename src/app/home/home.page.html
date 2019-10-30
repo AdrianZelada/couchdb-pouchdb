@@ -19,7 +19,7 @@
       </ion-list-header>
       <ion-item *ngFor="let item of list" (click)="updateState(item)">
         <ion-icon slot="start" color="medium" name="book"></ion-icon>
-        <ion-label>{{item.id}} - {{item.screening}}</ion-label>
+        <ion-label>{{item.idMysql}} - {{item.screening}} - {{item.statusCt}}</ion-label>
       </ion-item>
     </ion-list>
 </ion-content>
