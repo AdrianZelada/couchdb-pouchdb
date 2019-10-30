@@ -1,0 +1,28 @@
+
+<ion-list [formGroup]="form">
+  <ion-item>
+    <ion-label position="floating">Email</ion-label>
+    <ion-input formControlName="email"></ion-input>
+  </ion-item>
+
+  <ion-item>
+    <ion-label position="floating">First Name</ion-label>
+    <ion-input formControlName="firstName"></ion-input>
+  </ion-item>
+
+  <ion-item>
+    <ion-label position="floating">Last Name</ion-label>
+    <ion-input formControlName="lastName"></ion-input>
+  </ion-item>
+
+  <ion-item>
+    <ion-label position="floating">Status</ion-label>
+    <ion-input formControlName="status"></ion-input>
+  </ion-item>
+
+  <ion-item>
+    <ion-label position="floating">Username</ion-label>
+    <ion-input formControlName="username"></ion-input>
+  </ion-item>
+</ion-list>
+<ion-button (click)="save()"> Aceptar</ion-button>
