@@ -28,20 +28,29 @@ export class BeneficiaryPage implements OnInit {
             })
         )
         .subscribe((res: Array<any>) =>{
-          this.list = res;
+            console.log(res);
+            this.list = res;
         });
   }
 
   async update(item: any) {
+      console.log(item);
     const modal = await this.modalController.create({
       component: ViewDataComponent,
-      componentProps: {...item}
+      componentProps: {
+          data: {...item}
+      }
     });
-    return await modal.present();
+    await modal.present();
 
+    const { data } = await modal.onWillDismiss();
 
-    this.thbeneficiaryService.update(item).then((res) => {
-      console.log(res);
-    });
+    if (data) {
+        console.log(data);
+        this.thbeneficiaryService.update(data);
+    }
+    // this.thbeneficiaryService.update(item).then((res) => {
+    //   console.log(res);
+    // });
   }
 }

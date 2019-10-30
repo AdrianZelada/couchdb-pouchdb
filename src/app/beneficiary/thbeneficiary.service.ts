@@ -16,12 +16,12 @@ export class ThbeneficiaryService {
   constructor(private http: HttpClient, public zone: NgZone) { }
 
   getListDataToSync() {
-    return this.http.get('http://localhost:3105/api/Tp35Beneficiary/syncData');
+    return this.http.get('http://localhost:3105/api/Tp35Beneficiaries/syncData');
   }
 
   syncDataDb(oldIds, ids, online = true) {
-    this.beneficiaryLDb = new PouchDB('th_beneficiary');
-    this.beneficiaryRDb = new PouchDB('http://127.0.0.1:5984/th_beneficiary');
+    this.beneficiaryLDb = new PouchDB('tp35_beneficiary');
+    this.beneficiaryRDb = new PouchDB('http://127.0.0.1:5984/tp35_beneficiary');
 
     if (online) {
       this.replicateDB(oldIds).then(() => {
@@ -32,7 +32,7 @@ export class ThbeneficiaryService {
           } else {
             console.log('this.beneficiaryLDb', respo);
             localStorage.setItem('medical', JSON.stringify(ids));
-            this.beneficiaryLDb = new PouchDB('th_medical_appointment');
+            this.beneficiaryLDb = new PouchDB('tp35_beneficiary');
             this.beneficiaryLDb.sync(this.beneficiaryRDb, {
               live:true,
               retry:true,
@@ -136,7 +136,8 @@ export class ThbeneficiaryService {
   }
 
   update(data){
-    return this.beneficiaryLDb.put(data);
+      console.log(data);
+      return this.beneficiaryLDb.put(data);
   }
 
   removeInDevice(newIds: Array<any>){
