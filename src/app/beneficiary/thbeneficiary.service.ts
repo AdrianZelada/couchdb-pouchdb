@@ -2,6 +2,14 @@ import {Injectable, NgZone} from '@angular/core';
 import {BehaviorSubject, Observable} from 'rxjs';
 import {HttpClient} from '@angular/common/http';
 import PouchDB from 'pouchdb';
+import cordovaSqlitePlugin from 'pouchdb-adapter-cordova-sqlite';
+PouchDB.plugin(cordovaSqlitePlugin);
+
+// PouchDB.plugin(require('pouchdb-adapter-indexeddb'));
+// var PouchDB = require('pouchdb').plugin(require('pouchdb-adapter-websql'));
+PouchDB.plugin(require('pouchdb-adapter-websql'));
+
+import { environment as Enviroment } from 'src/environments/environment';
 
 @Injectable({
   providedIn: 'root'
@@ -16,12 +24,12 @@ export class ThbeneficiaryService {
   constructor(private http: HttpClient, public zone: NgZone) { }
 
   getListDataToSync() {
-    return this.http.get('http://localhost:3105/api/Tp35Beneficiaries/syncData');
+    return this.http.get(`${Enviroment.apiUrl}/Tp35Beneficiaries/syncData`);
   }
 
   syncDataDb(oldIds, ids, online = true) {
-    this.beneficiaryLDb = new PouchDB('tp35_beneficiary');
-    this.beneficiaryRDb = new PouchDB('http://127.0.0.1:5984/tp35_beneficiary');
+    this.beneficiaryLDb = new PouchDB('tp35_beneficiary',  {adapter: 'cordova-sqlite'});
+    this.beneficiaryRDb = new PouchDB(`${Enviroment.apiCouch}/tp35_beneficiary`);
 
     if (online) {
       this.replicateDB(oldIds).then(() => {
@@ -32,7 +40,7 @@ export class ThbeneficiaryService {
           } else {
             console.log('this.beneficiaryLDb', respo);
             localStorage.setItem('medical', JSON.stringify(ids));
-            this.beneficiaryLDb = new PouchDB('tp35_beneficiary');
+            this.beneficiaryLDb = new PouchDB('tp35_beneficiary', { adapter: 'cordova-sqlite'});
             this.beneficiaryLDb.sync(this.beneficiaryRDb, {
               live:true,
               retry:true,

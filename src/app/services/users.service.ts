@@ -1,10 +1,14 @@
 import {Injectable, NgZone} from '@angular/core';
 import PouchDB from 'pouchdb';
+import cordovaSqlitePlugin from 'pouchdb-adapter-cordova-sqlite';
+PouchDB.plugin(cordovaSqlitePlugin);
+
+// PouchDB.plugin(require('pouchdb-adapter-websql'));
 import {fromPromise} from 'rxjs/internal-compatibility';
 import {map, switchMap} from 'rxjs/operators';
 import {BehaviorSubject, Observable} from 'rxjs';
 import {HttpClient} from "@angular/common/http";
-
+import { environment as Enviroment } from 'src/environments/environment';
 @Injectable({
     providedIn: 'root'
 })
@@ -88,12 +92,14 @@ export class UsersService {
     }
 
     getSyncData() {
-        return this.http.get('http://localhost:3005/api/ThMedicalAppointments/syncData');
+        // return this.http.get(`http://localhost:3005/api/ThMedicalAppointments/syncData`);
+        return this.http.get(`${Enviroment.apiUrl}/ThMedicalAppointments/syncData`);
     }
 
     getCouchDBMedicalAppoitment(data){
-        this.appoitmentsLDb = new PouchDB('thmedicalappoitments');
-        this.appoitmentsRDb = new PouchDB('http://127.0.0.1:5984/thmedicalappoitments');
+        
+        this.appoitmentsLDb = new PouchDB('thmedicalappoitments.db', { adapter: 'cordova-sqlite'});
+        this.appoitmentsRDb = new PouchDB(`${Enviroment.apiCouch}/thmedicalappoitments`);
         // debugger;
         this.appoitmentsRDb.sync(this.appoitmentsLDb, {live: true, doc_ids: data}).on('complete', function () {
             console.log('complete');

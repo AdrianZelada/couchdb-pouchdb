@@ -1,5 +1,7 @@
 {
   "name": "couchDb-pouchDB",
-  "integrations": {},
+  "integrations": {
+    "cordova": {}
+  },
   "type": "angular"
 }

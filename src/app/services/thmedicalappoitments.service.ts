@@ -2,7 +2,11 @@ import {Injectable, NgZone} from '@angular/core';
 import {BehaviorSubject, Observable} from "rxjs";
 import {HttpClient} from "@angular/common/http";
 import PouchDB from "pouchdb";
+// PouchDB.plugin(require('pouchdb-adapter-websql'));
+import cordovaSqlitePlugin from 'pouchdb-adapter-cordova-sqlite';
+PouchDB.plugin(cordovaSqlitePlugin);
 
+import { environment as Enviroment} from 'src/environments/environment'
 @Injectable({
   providedIn: 'root'
 })
@@ -16,12 +20,12 @@ export class ThmedicalappoitmentsService {
   constructor(private http: HttpClient, public zone: NgZone) { }
 
   getListDataToSync(){
-    return this.http.get('http://localhost:3005/api/ThMedicalAppointments/syncData');
+    return this.http.get(`${Enviroment.apiUrl}/ThMedicalAppointments/syncData`);
   }
 
   syncDataDb(oldIds, ids, online = true) {
-    this.appoitmentsLDb = new PouchDB('th_medical_appointment');
-    this.appoitmentsRDb = new PouchDB('http://127.0.0.1:5984/th_medical_appointment');
+    this.appoitmentsLDb = new PouchDB('th_medical_appointment', {adapter: 'cordova-sqlite'});
+    this.appoitmentsRDb = new PouchDB(`${Enviroment.apiCouch}/th_medical_appointment`);
 
     if (online) {
         this.replicateDB(oldIds).then(() => {
@@ -32,7 +36,7 @@ export class ThmedicalappoitmentsService {
                 } else {
                     console.log('this.appoitmentsLDb', respo);
                     localStorage.setItem('medical', JSON.stringify(ids));
-                    this.appoitmentsLDb = new PouchDB('th_medical_appointment');
+                    this.appoitmentsLDb = new PouchDB('th_medical_appointment', { adapter: 'cordova-sqlite'});
                     this.appoitmentsLDb.sync(this.appoitmentsRDb, {
                         live:true,
                         retry:true,
