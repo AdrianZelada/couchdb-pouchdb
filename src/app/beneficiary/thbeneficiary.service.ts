@@ -96,13 +96,16 @@ export class ThbeneficiaryService {
       const repli = this.beneficiaryLDb.replicate
           .to(this.beneficiaryRDb, {doc_ids: ids})
           .on('complete', () =>{
-            console.log('complete');
-            repli.cancel();
-            resolve();
-          }).on('error', () => {
-            console.log('error');
-            reject();
-          });
+                console.log('complete');
+                repli.cancel();
+                resolve();
+            }).on('error', () => {
+
+                console.error('chhanges')
+            }).on('error', () => {
+                console.log('error');
+                reject();
+            });
     })
 
   }
@@ -137,6 +140,31 @@ export class ThbeneficiaryService {
 
   update(data){
       console.log(data);
+      const id = data._id;
+      const rev = data._rev;
+      delete data._id;
+      delete data._rev;
+      return new Promise((resolve, reject) => {
+          this.beneficiaryLDb.get(id, (err, doc) =>{
+              if (err) { return console.log(err); }
+              console.log(doc)
+              this.beneficiaryLDb.put({
+                  _id: id,
+                  _rev: doc._rev,
+                  ...data
+              }, (err, response) =>{
+                  if (err) {
+                      reject(err);
+                      return console.log(err);
+                  } else {
+                      resolve(response);
+                      this.getDataDb()
+                  }
+                  // handle response
+              });
+          });
+      })
+
       return this.beneficiaryLDb.put(data);
   }
 
