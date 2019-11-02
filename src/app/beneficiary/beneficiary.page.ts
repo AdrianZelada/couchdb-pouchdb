@@ -47,11 +47,13 @@ export class BeneficiaryPage implements OnInit {
 
     if (data) {
         console.log(data);
+        data.updatedAt = Date.now();
         this.thbeneficiaryService.update(data).then((res) => {
             console.log(res)
         }).catch((e) => {
             console.log(e)
         });
+
     }
     // this.thbeneficiaryService.update(item).then((res) => {
     //   console.log(res);
