@@ -4,8 +4,10 @@
 
 export const environment = {
   production: false,
-  apiUrl: 'http://localhost:3105/api',
-  apiCouch: 'http://localhost:5984'
+  apiUrl: 'http://192.168.88.83:3105/api',
+  apiCouch: 'http://192.168.88.83:5984'
+  // apiUrl: 'http://localhost:3105/api',
+  // apiCouch: 'http://localhost:5984'
   // apiUrl: 'http://192.168.88.43:3105/api',
   // apiCouch: 'http://192.168.88.43:5984'
 };
