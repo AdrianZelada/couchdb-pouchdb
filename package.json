@@ -27,6 +27,7 @@
     "cordova-android": "8.1.0",
     "cordova-plugin-sqlite-2": "^1.0.6",
     "core-js": "^2.5.4",
+    "moment": "^2.24.0",
     "pouchdb": "^7.1.1",
     "pouchdb-adapter-cordova-sqlite": "^2.0.7",
     "pouchdb-adapter-indexeddb": "0.0.0",
