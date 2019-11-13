@@ -3,7 +3,11 @@
     <ion-label>List Beneficiaries</ion-label>
   </ion-list-header>
   <ion-item *ngFor="let item of list" (click)="updateState(item)">
+    
     <ion-icon slot="start" color="medium" name="book"></ion-icon>
-    <ion-label>{{item.firstName}} - {{item.lastName}} - {{item.status}}</ion-label>
+    
+    <ion-label>
+        <span>{{item.updatedAt}}</span> <br>
+      {{item.firstName}} - {{item.lastName}} - {{item.status}}</ion-label>
   </ion-item>
 </ion-list>

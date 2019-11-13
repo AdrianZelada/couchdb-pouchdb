@@ -4,7 +4,7 @@ import {map} from "rxjs/operators";
 import {ThbeneficiaryService} from "./thbeneficiary.service";
 import {ModalController} from "@ionic/angular";
 import {ViewDataComponent} from "./view-data/view-data.component";
-
+const moment = require('moment');
 @Component({
   selector: 'app-beneficiary',
   templateUrl: './beneficiary.page.html',
@@ -47,7 +47,8 @@ export class BeneficiaryPage implements OnInit {
 
     if (data) {
         console.log(data);
-        data.updatedAt = Date.now();
+        data.updatedAt = new Date();// moment().format('YYYY-MM-DD h:mm:ss');
+        data.origin = 2;
         this.thbeneficiaryService.update(data).then((res) => {
             console.log(res)
         }).catch((e) => {
